@@ -12,7 +12,7 @@ const COURSES = [
     category: "Journalism",
     title: "Introduction to Investigative Reporting",
     description: "Learn how to uncover facts, verify sources, and build compelling investigative stories.",
-    embedUrl: "https://www.youtube.com/embed/H0K20FjX39Y",
+    embedUrl: "https://www.youtube.com/embed/z3eM2pV7xEM",
   },
   {
     category: "Journalism",
@@ -56,7 +56,7 @@ const COURSES = [
     category: "Computer Basics",
     title: "Navigating Networks and the Internet",
     description: "Learn fundamental concepts behind IP addresses, routers, and secure web browsing.",
-    embedUrl: "https://www.youtube.com/embed/BNpfcznEdvk",
+    embedUrl: "https://www.youtube.com/embed/DJoYwA3mSNg",
   },
   {
     category: "Computer Basics",
