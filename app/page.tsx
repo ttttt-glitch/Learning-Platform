@@ -74,16 +74,28 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-xl font-bold text-blue-600">Learning Platform</h1>
           <nav className="flex gap-6 text-sm font-medium text-gray-600">
-            <a href="#courses" className="hover:text-blue-600 transition">Courses Us</a>
+            <a href="#courses" className="hover:text-blue-600 transition">Courses</a>
             <a href="#contact" className="hover:text-blue-600 transition">Contact</a>
           </nav>
         </div>
       </header>
 
+      {/* Hero Section */}
+      <section className="bg-gradient-to-b from-white to-gray-100 py-16 border-b">
+        <div className="max-w-4xl mx-auto text-center px-4">
+          <h2 className="text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">
+            Expand Your Knowledge Disciplines
+          </h2>
+          <p className="text-lg text-gray-600">
+            Explore specialized categories, watch curated educational video lessons, and learn at your own pace.
+          </p>
+        </div>
+      </section>
+
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 py-8">
-        <section className="mb-8">
-          <h2 className="text-2xl font-bold mb-6">Featured Video Lessons</h2>
+      <main className="max-w-6xl mx-auto px-4 py-12">
+        <section className="mb-8" id="courses">
+          <h3 className="text-2xl font-bold mb-6">Featured Video Lessons</h3>
 
           {/* Search Bar Component */}
           <div className="mb-6 relative max-w-xl">
@@ -100,7 +112,7 @@ export default function Home() {
           </div>
 
           {/* Category Filter Buttons */}
-          <div className="flex flex-wrap gap-2 mb-8" id="courses">
+          <div className="flex flex-wrap gap-2 mb-8">
             {CATEGORIES.map((category) => (
               <button
                 key={category}
@@ -137,9 +149,9 @@ export default function Home() {
                     <span className="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-2">
                       {course.category}
                     </span>
-                    <h3 className="text-lg font-bold text-gray-900 mb-2">
+                    <h4 className="text-lg font-bold text-gray-900 mb-2">
                       {course.title}
-                    </h3>
+                    </h4>
                     <p className="text-sm text-gray-600 leading-relaxed">
                       {course.description}
                     </p>
@@ -157,10 +169,14 @@ export default function Home() {
         </section>
       </main>
 
-      {/* Footer / Contact Section */}
-      <footer id="contact" className="border-t bg-white mt-16 py-8">
-        <div className="max-w-6xl mx-auto px-4 text-center text-sm text-gray-500">
-          &copy; {new Date().getFullYear()} Learning Platform. All rights reserved.
+      {/* Contact Section / Footer */}
+      <footer id="contact" className="border-t bg-white mt-16 py-12">
+        <div className="max-w-6xl mx-auto px-4 text-center">
+          <h3 className="text-xl font-bold text-gray-900 mb-2">Get in Touch</h3>
+          <p className="text-sm text-gray-600 mb-6">Have questions or want to contribute a course? Reach out to us.</p>
+          <div className="text-sm text-gray-500">
+            &copy; {new Date().getFullYear()} Learning Platform. All rights reserved.
+          </div>
         </div>
       </footer>
     </div>
