@@ -84,6 +84,77 @@ const COURSES = [
     embedUrl: "https://www.youtube.com/embed/1A2B3C4D5E6",
   },
 ];
+interface Article {
+  id: string;
+  category: string;
+  title: string;
+  summary: string;
+  content: string;
+  author: string;
+  readTime: string;
+  date: string;
+}
+
+const ARTICLES: Article[] = [
+  {
+    id: "journalism-1",
+    category: "Journalism",
+    title: "The Fundamentals of Investigative Journalism",
+    summary: "Understand the principles of uncovering truthful and reliable information.",
+    content: `Write your full article here. You can make this as long as you want. Explain concepts, provide examples, and teach students in detail.
+
+You can even write multiple paragraphs.
+
+This is where your lesson or article goes.`,
+    author: "Learning Platform",
+    readTime: "6 min read",
+    date: "July 24, 2026",
+  },
+
+  {
+    id: "journalism-2",
+    category: "Journalism",
+    title: "Media Ethics",
+    summary: "Professional responsibilities of journalists.",
+    content: "Write your article here...",
+    author: "Learning Platform",
+    readTime: "5 min read",
+    date: "July 24, 2026",
+  },
+
+  {
+    id: "pharmacology-1",
+    category: "Pharmacology",
+    title: "Introduction to Pharmacokinetics",
+    summary: "Learn how medicines travel through the human body.",
+    content: "Write your article here...",
+    author: "Learning Platform",
+    readTime: "7 min read",
+    date: "July 24, 2026",
+  },
+
+  {
+    id: "computer-1",
+    category: "Computer Basics",
+    title: "Understanding Computer Hardware",
+    summary: "An introduction to the essential parts of a computer.",
+    content: "Write your article here...",
+    author: "Learning Platform",
+    readTime: "8 min read",
+    date: "July 24, 2026",
+  },
+
+  {
+    id: "public-health-1",
+    category: "Public Health",
+    title: "What Is Public Health?",
+    summary: "Learn how public health protects communities.",
+    content: "Write your article here...",
+    author: "Learning Platform",
+    readTime: "6 min read",
+    date: "July 24, 2026",
+  },
+];
 
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -100,6 +171,15 @@ export default function Home() {
     const matchesSearch =
       course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       course.description.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
+
+  // Filter articles based on active category and search query
+  const filteredArticles = ARTICLES.filter((article) => {
+    const matchesCategory = activeCategory === "All" || article.category === activeCategory;
+    const matchesSearch =
+      article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      article.summary.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
@@ -150,6 +230,7 @@ export default function Home() {
         <h1 className="text-2xl font-bold text-blue-600">Learning Platform</h1>
         <div className="space-x-6 text-sm font-medium">
           <a href="#courses" className="hover:text-blue-600">Courses</a>
+          <a href="#articles" className="hover:text-blue-600">Articles</a>
           <a href="#contact" className="hover:text-blue-600">Contact Us</a>
         </div>
       </nav>
@@ -224,6 +305,38 @@ export default function Home() {
           <div className="text-center py-16 bg-white border border-gray-200 rounded-2xl shadow-sm">
             <p className="text-gray-500 text-base font-medium">
               No courses found matching your search.
+            </p>
+          </div>
+        )}
+      </section>
+
+      {/* Course Articles & Resources Section */}
+      <section id="articles" className="max-w-6xl mx-auto mb-20">
+        <h3 className="text-2xl font-bold mb-6 border-l-4 border-blue-600 pl-3">Course Articles & Readings</h3>
+
+        {filteredArticles.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredArticles.map((article) => (
+              <div key={article.id} className="bg-white p-6 rounded-xl shadow border flex flex-col justify-between">
+                <div>
+                  <span className="text-xs font-semibold text-blue-600 uppercase tracking-wider">{article.category}</span>
+                  <h4 className="text-xl font-semibold mb-2 mt-1">{article.title}</h4>
+                  <p className="text-gray-600 text-sm mb-4">{article.summary}</p>
+                  <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 mb-4">
+                    <p className="text-xs text-gray-700 italic whitespace-pre-line line-clamp-3">{article.content}</p>
+                  </div>
+                </div>
+                <div className="pt-4 border-t border-gray-100 flex justify-between items-center text-xs text-gray-400">
+                  <span>{article.author}</span>
+                  <span>{article.readTime} • {article.date}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-16 bg-white border border-gray-200 rounded-2xl shadow-sm">
+            <p className="text-gray-500 text-base font-medium">
+              No articles found matching your search.
             </p>
           </div>
         )}
