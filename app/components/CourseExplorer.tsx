@@ -266,9 +266,9 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gray-50 text-gray-900 p-8">
       {/* Header / Navigation */}
-      <nav className="flex justify-between items-center max-w-6xl mx-auto mb-12 border-b pb-4 sticky top-0 bg-gray-50/90 backdrop-blur z-10 py-4">
-        <h1 className="text-2xl font-bold text-blue-600">Learning Platform</h1>
-        <div className="flex items-center space-x-6 text-sm font-medium">
+      <nav className="flex flex-wrap justify-between items-center gap-y-3 max-w-6xl mx-auto mb-12 border-b pb-4 sticky top-0 bg-gray-50/90 backdrop-blur z-10 py-4 px-4">
+  <h1 className="text-2xl font-bold text-blue-600">Learning Platform</h1>
+  <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm font-medium">
           <a href="#courses" className="hover:text-blue-600">Courses</a>
           <a href="#articles" className="hover:text-blue-600">Articles</a>
           <a href="#contact" className="hover:text-blue-600">Contact Us</a>
