@@ -1,6 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { signOut } from "firebase/auth";
+import { auth } from "@/lib/firebase";
+import Link from "next/link";
 
 // Define categories for the filter bar
 const CATEGORIES = ["All", "Journalism", "Pharmacology", "Computer Basics", "Public Health"];
@@ -9,18 +13,21 @@ const CATEGORIES = ["All", "Journalism", "Pharmacology", "Computer Basics", "Pub
 const COURSES = [
   // Journalism
   {
+    id: "journalism-1",
     category: "Journalism",
     title: "Introduction to Investigative Reporting",
     description: "Learn how to uncover facts, verify sources, and build compelling investigative stories.",
     embedUrl: "https://www.youtube.com/embed/z3eM2pV7xEM",
   },
   {
+    id: "journalism-2",
     category: "Journalism",
     title: "Ethics and Media Law",
     description: "Understand the legal boundaries, responsibilities, and ethical standards of modern media.",
     embedUrl: "https://www.youtube.com/embed/5Hw7h0x_m60",
   },
   {
+    id: "journalism-3",
     category: "Journalism",
     title: "Digital Journalism & Storytelling",
     description: "Adapt traditional reporting for digital platforms, social media, and modern web audiences.",
@@ -28,18 +35,21 @@ const COURSES = [
   },
   // Pharmacology
   {
+    id: "pharmacology-1",
     category: "Pharmacology",
     title: "Basics of Pharmacokinetics",
     description: "Explore how drugs move through the body—absorption, distribution, metabolism, and excretion.",
     embedUrl: "https://www.youtube.com/embed/7X8c4Vz2q50",
   },
   {
+    id: "pharmacology-2",
     category: "Pharmacology",
     title: "Understanding Receptor Interactions",
     description: "An introductory look into how medications bind to cellular receptors to create therapeutic responses.",
     embedUrl: "https://www.youtube.com/embed/8vY0f3c5b20",
   },
   {
+    id: "pharmacology-3",
     category: "Pharmacology",
     title: "Introduction to Drug Classifications",
     description: "Overview of major pharmaceutical classes, mechanisms of action, and clinical applications.",
@@ -47,18 +57,21 @@ const COURSES = [
   },
   // Computer Basics
   {
+    id: "computer-1",
     category: "Computer Basics",
     title: "Hardware vs. Software Architecture",
     description: "Discover how physical components and operating systems communicate to run applications.",
     embedUrl: "https://www.youtube.com/embed/Ak7ifoZkcKA",
   },
   {
+    id: "computer-2",
     category: "Computer Basics",
     title: "Navigating Networks and the Internet",
     description: "Learn fundamental concepts behind IP addresses, routers, and secure web browsing.",
     embedUrl: "https://www.youtube.com/embed/DJoYwA3mSNg",
   },
   {
+    id: "computer-3",
     category: "Computer Basics",
     title: "Operating Systems Explained",
     description: "Understand file systems, process management, and user interfaces across major operating systems.",
@@ -66,24 +79,28 @@ const COURSES = [
   },
   // Public Health
   {
+    id: "public-health-1",
     category: "Public Health",
     title: "Introduction to Epidemiology",
     description: "Study the patterns, causes, and effects of health and disease conditions in defined populations.",
     embedUrl: "https://www.youtube.com/embed/0K4X2t8L3z0",
   },
   {
+    id: "public-health-2",
     category: "Public Health",
     title: "Community Health Interventions",
     description: "Explore how health programs and policies are designed to protect populations and prevent disease outbreaks.",
     embedUrl: "https://www.youtube.com/embed/4K5f6g7h8i9",
   },
   {
+    id: "public-health-3",
     category: "Public Health",
     title: "Global Health Policy & Systems",
     description: "Examine international health organizations, healthcare delivery models, and systemic inequalities.",
     embedUrl: "https://www.youtube.com/embed/1A2B3C4D5E6",
   },
 ];
+
 interface Article {
   id: string;
   category: string;
@@ -110,7 +127,6 @@ This is where your lesson or article goes.`,
     readTime: "6 min read",
     date: "July 24, 2026",
   },
-
   {
     id: "journalism-2",
     category: "Journalism",
@@ -121,7 +137,6 @@ This is where your lesson or article goes.`,
     readTime: "5 min read",
     date: "July 24, 2026",
   },
-
   {
     id: "pharmacology-1",
     category: "Pharmacology",
@@ -132,7 +147,6 @@ This is where your lesson or article goes.`,
     readTime: "7 min read",
     date: "July 24, 2026",
   },
-
   {
     id: "computer-1",
     category: "Computer Basics",
@@ -143,7 +157,6 @@ This is where your lesson or article goes.`,
     readTime: "8 min read",
     date: "July 24, 2026",
   },
-
   {
     id: "public-health-1",
     category: "Public Health",
@@ -157,13 +170,41 @@ This is where your lesson or article goes.`,
 ];
 
 export default function Home() {
+  const { user, loading } = useAuth();
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Tracks which course IDs the logged-in user has paid for, e.g. { "journalism-1": true }
+  const [paidCourses, setPaidCourses] = useState<Record<string, boolean>>({});
 
   // Contact form state hooks
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  const handleLogout = async () => {
+    await signOut(auth);
+  };
+
+  // Load the user's paid-course claims whenever they log in/out.
+  // getIdTokenResult(true) forces a fresh token so newly-granted access shows up right away.
+  useEffect(() => {
+    async function loadClaims() {
+      if (!user) {
+        setPaidCourses({});
+        return;
+      }
+      try {
+        const tokenResult = await user.getIdTokenResult(true);
+        console.log("CLAIMS:", tokenResult.claims); // debug line
+        setPaidCourses((tokenResult.claims.paidCourses as Record<string, boolean>) || {});
+      } catch (err) {
+        console.error("Failed to load access claims:", err);
+        setPaidCourses({});
+      }
+    }
+    loadClaims();
+  }, [user]);
 
   // Filter courses based on active category and search query
   const filteredCourses = COURSES.filter((course) => {
@@ -183,7 +224,6 @@ export default function Home() {
     return matchesCategory && matchesSearch;
   });
 
-  // Asynchronous handleSubmit function using fetch API with your Formspree endpoint
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSubmitting(true);
@@ -228,10 +268,30 @@ export default function Home() {
       {/* Header / Navigation */}
       <nav className="flex justify-between items-center max-w-6xl mx-auto mb-12 border-b pb-4 sticky top-0 bg-gray-50/90 backdrop-blur z-10 py-4">
         <h1 className="text-2xl font-bold text-blue-600">Learning Platform</h1>
-        <div className="space-x-6 text-sm font-medium">
+        <div className="flex items-center space-x-6 text-sm font-medium">
           <a href="#courses" className="hover:text-blue-600">Courses</a>
           <a href="#articles" className="hover:text-blue-600">Articles</a>
           <a href="#contact" className="hover:text-blue-600">Contact Us</a>
+          {!loading && (
+            user ? (
+              <div className="flex items-center gap-3">
+                <span className="text-gray-600">Welcome, {user.email}</span>
+                <button
+                  onClick={handleLogout}
+                  className="bg-gray-200 hover:bg-gray-300 px-3 py-1.5 rounded-full"
+                >
+                  Log Out
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <Link href="/login" className="hover:text-blue-600">Log In</Link>
+                <Link href="/signup" className="bg-blue-600 text-white px-3 py-1.5 rounded-full hover:bg-blue-700">
+                  Sign Up
+                </Link>
+              </div>
+            )
+          )}
         </div>
       </nav>
 
@@ -249,7 +309,6 @@ export default function Home() {
       <section id="courses" className="max-w-6xl mx-auto mb-20">
         <h3 className="text-2xl font-bold mb-6 border-l-4 border-blue-600 pl-3">Featured Video Lessons</h3>
 
-        {/* Search Bar Input */}
         <div className="mb-6 relative max-w-xl">
           <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-400">
             🔍
@@ -263,7 +322,6 @@ export default function Home() {
           />
         </div>
 
-        {/* Filter Button Bar */}
         <div className="flex flex-wrap gap-2 mb-8">
           {CATEGORIES.map((category) => (
             <button
@@ -280,26 +338,39 @@ export default function Home() {
           ))}
         </div>
 
-        {/* Dynamic Course Grid */}
         {filteredCourses.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredCourses.map((course, index) => (
-              <div key={index} className="bg-white p-4 rounded-xl shadow border flex flex-col justify-between">
-                <div>
-                  <div className="aspect-video mb-4 bg-black rounded-lg overflow-hidden">
-                    <iframe 
-                      className="w-full h-full" 
-                      src={course.embedUrl} 
-                      title={course.title} 
-                      allowFullScreen
-                    ></iframe>
+            {filteredCourses.map((course) => {
+              const hasAccess = !!paidCourses[course.id];
+              return (
+                <div key={course.id} className="bg-white p-4 rounded-xl shadow border flex flex-col justify-between">
+                  <div>
+                    <div className="aspect-video mb-4 bg-black rounded-lg overflow-hidden flex items-center justify-center">
+                      {hasAccess ? (
+                        <iframe
+                          className="w-full h-full"
+                          src={course.embedUrl}
+                          title={course.title}
+                          allowFullScreen
+                        ></iframe>
+                      ) : (
+                        <div className="text-center text-white p-4">
+                          <p className="font-semibold mb-1">🔒 Locked</p>
+                          <p className="text-xs text-gray-300">
+                            {user
+                              ? "Pay via mobile money to unlock this course."
+                              : "Log in and pay via mobile money to unlock this course."}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                    <span className="text-xs font-semibold text-blue-600 uppercase tracking-wider">{course.category}</span>
+                    <h4 className="text-xl font-semibold mb-2 mt-1">{course.title}</h4>
+                    <p className="text-gray-600 text-sm">{course.description}</p>
                   </div>
-                  <span className="text-xs font-semibold text-blue-600 uppercase tracking-wider">{course.category}</span>
-                  <h4 className="text-xl font-semibold mb-2 mt-1">{course.title}</h4>
-                  <p className="text-gray-600 text-sm">{course.description}</p>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <div className="text-center py-16 bg-white border border-gray-200 rounded-2xl shadow-sm">
@@ -342,7 +413,7 @@ export default function Home() {
         )}
       </section>
 
-      {/* Contact Us Section with Formspree Async JSON Handler */}
+      {/* Contact Us Section */}
       <section id="contact" className="max-w-xl mx-auto bg-white p-8 rounded-2xl shadow-lg border mb-12">
         <div className="text-center mb-6">
           <h3 className="text-2xl font-bold text-gray-900">Get in Touch</h3>
@@ -360,42 +431,38 @@ export default function Home() {
                 {errorMessage}
               </div>
             )}
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
-              <input 
-                type="text" 
-                name="name" 
-                required 
-                placeholder="Jane Doe" 
+              <input
+                type="text"
+                name="name"
+                required
+                placeholder="Jane Doe"
                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Your Email</label>
-              <input 
-                type="email" 
-                name="email" 
-                required 
-                placeholder="jane@example.com" 
+              <input
+                type="email"
+                name="email"
+                required
+                placeholder="jane@example.com"
                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Your Message</label>
-              <textarea 
-                name="message" 
-                rows={4} 
-                required 
-                placeholder="How can we help you?" 
+              <textarea
+                name="message"
+                rows={4}
+                required
+                placeholder="How can we help you?"
                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
               ></textarea>
             </div>
-
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={submitting}
               className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold shadow hover:bg-blue-700 transition disabled:opacity-50"
             >

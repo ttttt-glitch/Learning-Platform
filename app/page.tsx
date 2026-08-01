@@ -1,3 +1,4 @@
+console.log("Firebase project:", process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID);
 import type { Metadata } from 'next';
 import CourseExplorer from './components/CourseExplorer';
 
@@ -17,5 +18,6 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
+  
   return <CourseExplorer />;
 }
