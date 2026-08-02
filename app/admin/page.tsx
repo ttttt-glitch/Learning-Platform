@@ -59,7 +59,7 @@ export default function AdminPage() {
         setMessage(`Access granted: ${email} -> ${courseIds.join(", ")}`);
       } else {
         setStatus("error");
-        setMessage(`data?.error || data?.message || Request failed (${response.status})`);
+        setMessage( data?.error || data?.message || `Request failed (${response.status})`);
       }
     } catch (err) {
       setStatus("error");
