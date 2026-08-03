@@ -23,7 +23,8 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const user = await adminAuth.getUserByEmail(email);
+    const normalizedEmail = email.trim().toLowerCase();
+const user = await adminAuth.getUserByEmail(normalizedEmail);
     const existingClaims = user.customClaims || {};
 
     // Normalize whatever format paidCourses is currently in (old array or object)
